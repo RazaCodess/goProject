@@ -28,4 +28,6 @@ public interface ProfileDao {
 
 	void deleteByUsername(String pusername);
 
+	String findPasswordByUsernameOrEmail(String pusernameEmail);
+
 }

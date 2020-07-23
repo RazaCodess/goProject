@@ -109,6 +109,20 @@ public class ProfileDaoImpl implements ProfileDao {
 		ProfileDTO profileDTO=jdbcTemplate.queryForObject(sql, data,new BeanPropertyRowMapper<>(ProfileDTO.class));
 		return profileDTO;
 	}
+	
+	
+	@Override
+	public String findPasswordByUsernameOrEmail(String pusernameEmail) {
+		String pass="";
+		String sql = "select password from user_login_tbl where username=? or email=?";
+		Object[] data={pusernameEmail,pusernameEmail};
+		try{
+			 pass=jdbcTemplate.queryForObject(sql, data,String.class);
+		}catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		return pass;
+	}
 
 	@Override
 	public void deleteByUsername(String pusername) {

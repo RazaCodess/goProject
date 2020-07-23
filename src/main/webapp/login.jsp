@@ -80,7 +80,7 @@
 		             <br/>
 		<button type="button" class="btn btn-primary" onclick="validateLogin();">Sign In</button>
 		<a href="signup.jsp"><button type="button" class="btn btn-info">Sign Up</button></a>
-		<a href="forgotPassword.jsp"><button type="button" class="btn btn-primary">Forget Password</button></a>
+		<a href="fpassword"><button type="button" class="btn btn-primary">Forget Password</button></a>
 		</div>
 		</form>
 	</div>
