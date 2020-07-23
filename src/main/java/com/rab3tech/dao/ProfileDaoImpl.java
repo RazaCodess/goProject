@@ -5,35 +5,32 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-import javax.sql.DataSource;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 //Object which is present inside spring container is called bean
-@Repository //@Service, @Component , @Controller
+@Repository //@Controller
 public class ProfileDaoImpl implements ProfileDao {
 	
-	@Autowired
+	/*@Autowired
 	@Qualifier("pdataSource")
-	private DataSource datasource;
+	private DataSource datasource;*/
 	
-	JdbcTemplate jdbcTemplate=null;
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
 	
-	
+/*	JdbcTemplate jdbcTemplate=null;
 	@PostConstruct //This annotation ensures this method will be called for sure only once after all the beans creation
 	public void magicMethod() {
 		//jdbcTemplate = because of line spring jdbcTemplate can talk to database
 		jdbcTemplate=new JdbcTemplate(datasource);	
 	}
-	
+*/	
 	@Override
 	public String updateSignup(ProfileDTO profileDTO) {
 		String sql = "update user_login_tbl set name=?,email=?,qualification=?,mobile=?,photo=?,gender=? where username=?";
@@ -60,23 +57,13 @@ public class ProfileDaoImpl implements ProfileDao {
 		return profileDTOs;
 	}
 	
+
 	@Override
 	public List<String> findAllQualification() {
-		List<String> qualifications = new ArrayList<>();
 		String sql = "select distinct qualification from user_login_tbl ";
-		try(Connection conn = datasource.getConnection();PreparedStatement pstmt = conn.prepareStatement(sql);ResultSet rs = pstmt.executeQuery();){
-			// Fire the query
-			// CTR+SHIFT+O
-			while (rs.next()) { // here user is there
-				String q = rs.getString(1);
-				qualifications.add(q);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		List<String> qualifications=jdbcTemplate.queryForList(sql, String.class);
 		return qualifications;
 	}
-	
 	
 	
 	@Override
@@ -134,49 +121,17 @@ public class ProfileDaoImpl implements ProfileDao {
 	public ProfileDTO authUser(String pusername, String ppassword) {
 		ProfileDTO profileDTO = null;
 		String sql = "select username,password,name,email,qualification,mobile,photo,gender,createdate from user_login_tbl where username=? and password=?";
-		ResultSet rs=null;
-		try(Connection conn = datasource.getConnection();PreparedStatement pstmt = conn.prepareStatement(sql);){
-			pstmt.setString(1, pusername);
-			pstmt.setString(2, ppassword);
-			 rs = pstmt.executeQuery();
-			// Fire the query
-			// CTR+SHIFT+O
-			if (rs.next()) { // here user is there
-				String username = rs.getString(1);
-				String password = rs.getString(2);
-				String name = rs.getString(3);
-				String email = rs.getString(4);
-				String qualification = rs.getString(5);
-				String mobile = rs.getString(6);
-				String photo = rs.getString(7);
-				String gender = rs.getString(8);
-				profileDTO = new ProfileDTO(username, password, name, email, mobile, gender, photo, qualification);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}finally {
-			if(rs!=null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
+		Object[] data = { pusername, ppassword };
+		try {
+			profileDTO = jdbcTemplate.queryForObject(sql, data, new BeanPropertyRowMapper<>(ProfileDTO.class));
+		} catch (DataAccessException e) {
+			System.out.println(e.getMessage());
 		}
 		return profileDTO;
-
 	}
 
 	@Override
 	public void show(){
-		try {
-		Connection conn=datasource.getConnection();
-		if( conn!=null)
-		System.out.println("Connection is established!!!!!!!!!!!!!!!"+ conn);
-			
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
 		
 	}
 }
