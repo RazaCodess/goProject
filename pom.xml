@@ -7,7 +7,7 @@
   <properties>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<maven.compiler.source>1.8</maven.compiler.source>
-		<springa.version>5.0.2.RELEASE</springa.version>
+		<springa.version>5.2.4.RELEASE</springa.version>
 	</properties>
 	
 <dependencies>
